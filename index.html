@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MakanPlan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
 <style>
-
 /* ═══════════════════════════════════════════
    GLOBAL
 ═══════════════════════════════════════════ */
@@ -32,12 +34,12 @@
   --p-green: #4caf7d;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-variant-numeric: lining-nums tabular-nums; }
 
 html, body {
   height: 100%;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
 /* ── SCREENS ── */
@@ -102,7 +104,7 @@ html, body {
 }
 
 .c-logo {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 15px;
   font-weight: 800;
   color: var(--c-accent);
@@ -111,7 +113,7 @@ html, body {
 }
 
 .c-headline {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 30px;
   font-weight: 900;
   line-height: 1.1;
@@ -163,7 +165,7 @@ html, body {
   border: 2px solid var(--c-border);
   border-radius: 14px;
   padding: 14px 16px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: var(--c-text);
@@ -197,7 +199,7 @@ html, body {
 }
 
 .cal-month-label {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.3px;
@@ -315,7 +317,7 @@ html, body {
   border: none;
   border-radius: 16px;
   padding: 17px;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
@@ -356,7 +358,7 @@ html, body {
 }
 
 .p-logo {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 20px;
   font-weight: 800;
   color: var(--p-accent);
@@ -373,7 +375,7 @@ html, body {
   outline: none;
   text-align: right;
   width: 120px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   cursor: pointer;
 }
 .p-trip-name:focus { color: var(--p-text); border-bottom: 1px solid var(--p-accent); }
@@ -386,7 +388,7 @@ html, body {
   cursor: pointer;
   padding: 4px 8px 4px 0;
   display: flex; align-items: center; gap: 6px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 13px;
   font-weight: 600;
 }
@@ -409,7 +411,7 @@ html, body {
   border: 1.5px solid var(--p-border);
   background: transparent;
   color: var(--p-muted);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -422,7 +424,7 @@ html, body {
 .p-timeline { padding: 0 20px; }
 
 .p-day-label {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -533,7 +535,7 @@ html, body {
 
 .btn-paste {
   background: var(--p-accent); color: #000; border: none; border-radius: 12px;
-  padding: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 700;
+  padding: 13px; 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all 0.15s;
   display: flex; align-items: center; justify-content: center; gap: 6px;
 }
@@ -541,7 +543,7 @@ html, body {
 
 .btn-share {
   background: #25D366; color: #fff; border: none; border-radius: 12px;
-  padding: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 700;
+  padding: 13px; 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all 0.15s;
   display: flex; align-items: center; justify-content: center; gap: 6px;
 }
@@ -569,7 +571,7 @@ html, body {
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .sheet-handle { width: 36px; height: 4px; background: var(--p-border); border-radius: 2px; margin: 0 auto 18px; }
-.sheet-title { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--p-text); }
+.sheet-title { 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--p-text); }
 
 .form-group { margin-bottom: 14px; }
 .form-label { font-size: 10px; font-weight: 700; color: var(--p-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -577,7 +579,7 @@ html, body {
 .form-input {
   width: 100%; background: var(--p-card); border: 1.5px solid var(--p-border);
   border-radius: 10px; padding: 11px 14px; color: var(--p-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; outline: none; transition: border-color 0.15s;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; outline: none; transition: border-color 0.15s;
 }
 .form-input:focus { border-color: var(--p-accent); }
 
@@ -586,7 +588,7 @@ html, body {
 .chip {
   padding: 7px 14px; border-radius: 50px; border: 1.5px solid var(--p-border);
   background: transparent; color: var(--p-muted);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 600;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 12px; font-weight: 600;
   cursor: pointer; transition: all 0.15s;
 }
 .chip.active { border-color: var(--p-accent); background: rgba(245,166,35,0.12); color: var(--p-accent); }
@@ -594,12 +596,12 @@ html, body {
 .sheet-actions { display: grid; grid-template-columns: auto 1fr; gap: 8px; margin-top: 18px; }
 .btn-cancel {
   background: var(--p-card); border: 1.5px solid var(--p-border); border-radius: 12px;
-  padding: 13px; color: var(--p-muted); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  padding: 13px; color: var(--p-muted); 'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 14px; font-weight: 600; cursor: pointer;
 }
 .btn-save {
   background: var(--p-accent); border: none; border-radius: 12px; padding: 13px;
-  color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
+  color: #000; 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
 }
 .btn-save:hover { background: #f7b640; }
 
@@ -621,7 +623,7 @@ html, body {
 .btn-delete {
   background: rgba(232,80,42,0.12); border: 1.5px solid rgba(232,80,42,0.3);
   border-radius: 12px; padding: 13px; color: var(--p-accent2);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
   transition: all 0.15s;
 }
 .btn-delete:hover { background: rgba(232,80,42,0.22); }
@@ -693,7 +695,7 @@ html, body {
 .saved-delete-btn:hover { color: var(--c-accent); border-color: var(--c-accent); background: rgba(232,80,42,0.06); }
 
 .saved-trip-name {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 20px; font-weight: 900;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 20px; font-weight: 900;
   color: var(--c-text); margin-bottom: 4px; letter-spacing: -0.5px;
 }
 .saved-trip-dates {
@@ -709,7 +711,7 @@ html, body {
   background: var(--c-accent); color: #fff;
   border: none; border-radius: 12px;
   padding: 13px;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 800;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 800;
   cursor: pointer; transition: all 0.15s;
   display: flex; align-items: center; justify-content: center; gap: 6px;
 }
@@ -744,17 +746,17 @@ html, body {
 }
 @keyframes popIn { from { transform: scale(0.88); opacity:0; } to { transform: scale(1); opacity:1; } }
 .del-confirm-icon { font-size: 36px; margin-bottom: 12px; }
-.del-confirm-title { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 18px; font-weight: 900; color: var(--c-text); margin-bottom: 6px; }
+.del-confirm-title { 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 18px; font-weight: 900; color: var(--c-text); margin-bottom: 6px; }
 .del-confirm-sub { font-size: 13px; color: var(--c-muted); margin-bottom: 20px; line-height: 1.5; }
 .del-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .del-confirm-cancel {
   background: var(--c-card); border: 1.5px solid var(--c-border);
   border-radius: 12px; padding: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: var(--c-muted); cursor: pointer;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 600; color: var(--c-muted); cursor: pointer;
 }
 .del-confirm-ok {
   background: #e8502a; border: none; border-radius: 12px; padding: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
+  'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
   transition: background 0.15s;
 }
 .del-confirm-ok:hover { background: #c73f1e; }
