@@ -514,7 +514,12 @@ html, body {
   z-index: 200;
 }
 
-.quick-btns { display: flex; gap: 6px; margin-bottom: 10px; justify-content: center; }
+.quick-row-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--p-muted);
+  margin-bottom: 6px; padding: 0 2px;
+}
+.quick-btns { display: flex; gap: 6px; margin-bottom: 8px; justify-content: flex-start; }
 .qbtn {
   flex: 1;
   background: var(--p-card);
@@ -871,12 +876,18 @@ html, body {
 
   <!-- Bottom bar -->
   <div class="p-bottom">
+    <div class="quick-row-label">🍴 Food</div>
     <div class="quick-btns">
       <button class="qbtn" onclick="quickAdd('Breakfast')">☕<span>Bfast</span></button>
       <button class="qbtn" onclick="quickAdd('Lunch')">🍜<span>Lunch</span></button>
       <button class="qbtn" onclick="quickAdd('Cafe')">🧋<span>Cafe</span></button>
       <button class="qbtn" onclick="quickAdd('Dinner')">🍽<span>Dinner</span></button>
       <button class="qbtn" onclick="quickAdd('Snack')">🍡<span>Snack</span></button>
+    </div>
+    <div class="quick-row-label">📍 Places</div>
+    <div class="quick-btns">
+      <button class="qbtn" onclick="quickAdd('Landmark')">📸<span>Spot</span></button>
+      <button class="qbtn" onclick="quickAdd('Hotel')">🏨<span>Hotel</span></button>
     </div>
     <div class="main-actions">
       <button class="btn-paste" onclick="openPasteModal()">🔗 Paste Link</button>
@@ -911,6 +922,8 @@ html, body {
         <button class="chip" onclick="selectChip(this,'pasteType','Cafe')">🧋 Cafe</button>
         <button class="chip" onclick="selectChip(this,'pasteType','Dinner')">🍽 Dinner</button>
         <button class="chip" onclick="selectChip(this,'pasteType','Snack')">🍡 Snack</button>
+        <button class="chip" onclick="selectChip(this,'pasteType','Landmark')">📸 Landmark</button>
+        <button class="chip" onclick="selectChip(this,'pasteType','Hotel')">🏨 Hotel</button>
       </div>
     </div>
     <div class="sheet-actions">
@@ -938,18 +951,32 @@ html, body {
       </div>
     </div>
     <div class="form-group">
+      <label class="form-label">Category</label>
+      <div class="chip-group" id="editCatChips">
+        <button class="chip active" onclick="selectCategory(this,'Food')">🍴 Food</button>
+        <button class="chip" onclick="selectCategory(this,'Places')">📍 Places</button>
+      </div>
+    </div>
+    <div class="form-group" id="editFoodTypeGroup">
       <label class="form-label">Meal Type</label>
       <div class="chip-group" id="editTypeChips">
         <button class="chip" onclick="selectChip(this,'editType','Breakfast')">☕ Breakfast</button>
-        <button class="chip" onclick="selectChip(this,'editType','Lunch')">🍜 Lunch</button>
+        <button class="chip active" onclick="selectChip(this,'editType','Lunch')">🍜 Lunch</button>
         <button class="chip" onclick="selectChip(this,'editType','Cafe')">🧋 Cafe</button>
         <button class="chip" onclick="selectChip(this,'editType','Dinner')">🍽 Dinner</button>
         <button class="chip" onclick="selectChip(this,'editType','Snack')">🍡 Snack</button>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Mode</label>
-      <div class="chip-group">
+    <div class="form-group" id="editPlaceTypeGroup" style="display:none">
+      <label class="form-label">Place Type</label>
+      <div class="chip-group" id="editPlaceChips">
+        <button class="chip active" onclick="selectChip(this,'editType','Landmark')">📸 Landmark</button>
+        <button class="chip" onclick="selectChip(this,'editType','Hotel')">🏨 Hotel</button>
+      </div>
+    </div>
+    <div class="form-group" id="editModeGroup">
+      <label class="form-label" id="editModeLabel">Mode</label>
+      <div class="chip-group" id="editModeChips">
         <button class="chip active" id="modedinein" onclick="selectMode('Dine-in')">🍽 Dine-in</button>
         <button class="chip" id="modegrab" onclick="selectMode('GrabFood')">🛵 GrabFood</button>
       </div>
@@ -1094,8 +1121,19 @@ function updateCreateBtn() {
    STATE
 ═══════════════════════════════ */
 let state = { tripName: '', currentDay: 0, days: [] };
-const MEAL_EMOJIS = { Breakfast:'☕', Lunch:'🍜', Cafe:'🧋', Dinner:'🍽', Snack:'🍡' };
-const MEAL_TIMES  = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'19:00', Snack:'17:00' };
+const MEAL_EMOJIS = { Breakfast:'☕', Lunch:'🍜', Cafe:'🧋', Dinner:'🍽', Snack:'🍡', Landmark:'📸', Hotel:'🏨' };
+const MEAL_TIMES  = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'19:00', Snack:'17:00', Landmark:'10:00', Hotel:'14:00' };
+const FOOD_TYPES  = ['Breakfast','Lunch','Cafe','Dinner','Snack'];
+const PLACE_TYPES = ['Landmark','Hotel'];
+const LANDMARK_MODES = ['🚗 Drive','🚶 Walk'];
+const HOTEL_MODES    = ['🔑 Check-in','🧳 Check-out'];
+const FOOD_MODES     = ['🍽 Dine-in','🛵 GrabFood'];
+// Internal mode keys (stored in state)
+const MODE_KEYS = {
+  '🍽 Dine-in':'Dine-in','🛵 GrabFood':'GrabFood',
+  '🚗 Drive':'Drive','🚶 Walk':'Walk',
+  '🔑 Check-in':'Check-in','🧳 Check-out':'Check-out'
+};
 let editingId = null;
 let chipState = { editType:'Lunch', pasteType:'Lunch' };
 let editMode = 'Dine-in';
@@ -1263,7 +1301,7 @@ function renderPlannerTimeline() {
         <button class="del-btn" onclick="deleteItem(event,'${item.id}')">×</button>
         <div class="item-top">
           <div class="item-type">${MEAL_EMOJIS[item.type]} ${item.type}</div>
-          <span class="mode-badge ${item.mode==='GrabFood'?'grab':''}">${item.mode==='GrabFood'?'🛵 GrabFood':'🍽 Dine-in'}</span>
+          ${!['Landmark','Hotel'].includes(item.type) ? `<span class="mode-badge ${item.mode==='GrabFood'?'grab':''}">${item.mode==='GrabFood'?'🛵 GrabFood':'🍽 Dine-in'}</span>` : ''}
         </div>
         <div class="item-name">${item.placeName || '<span style="color:var(--p-muted)">Add place name</span>'}</div>
         <div class="item-bottom">
@@ -1297,13 +1335,13 @@ function getDefaultTime(type) {
 
 function quickAdd(type) {
   const id = Date.now().toString();
+  const defaultMode = type === 'Hotel' ? 'Check-in' : type === 'Landmark' ? 'Drive' : 'Dine-in';
   state.days[state.currentDay].items.push({
-    id, time: getDefaultTime(type),
-    type, placeName: '', mapLink: '', mode: 'Dine-in', notes: ''
+    id, time: MEAL_TIMES[type] || '12:00',
+    type, placeName: '', mapLink: '', mode: defaultMode, notes: ''
   });
   saveState();
   renderPlannerTimeline();
-  // Open edit sheet immediately so user can fill in place name
   openEdit(id);
 }
 
@@ -1358,22 +1396,44 @@ function openEdit(id) {
   document.getElementById('editName').value = item.placeName;
   document.getElementById('editNotes').value = item.notes || '';
   document.getElementById('editMapLink').value = item.mapLink || '';
-  // Show/hide preview link
+
   const preview = document.getElementById('mapLinkPreview');
   if (item.mapLink) { preview.href = item.mapLink; preview.style.display = 'inline-block'; }
   else { preview.style.display = 'none'; }
-  // Live update preview as user types
   document.getElementById('editMapLink').oninput = function() {
     if (this.value.trim()) { preview.href = this.value.trim(); preview.style.display = 'inline-block'; }
     else { preview.style.display = 'none'; }
   };
+
   chipState.editType = item.type;
-  editMode = item.mode;
-  document.querySelectorAll('#editTypeChips .chip').forEach(c =>
+  editMode = item.mode || 'Dine-in';
+
+  const isPlace = PLACE_TYPES.includes(item.type);
+
+  // Set category chips
+  document.querySelectorAll('#editCatChips .chip').forEach(c =>
+    c.classList.toggle('active', isPlace ? c.textContent.includes('Places') : c.textContent.includes('Food'))
+  );
+
+  // Show correct type group
+  document.getElementById('editFoodTypeGroup').style.display = isPlace ? 'none' : 'block';
+  document.getElementById('editPlaceTypeGroup').style.display = isPlace ? 'block' : 'none';
+
+  // Set type chips
+  const typeChipsId = isPlace ? 'editPlaceChips' : 'editTypeChips';
+  document.querySelectorAll(`#${typeChipsId} .chip`).forEach(c =>
     c.classList.toggle('active', c.textContent.includes(item.type))
   );
-  document.getElementById('modedinein').classList.toggle('active', item.mode === 'Dine-in');
-  document.getElementById('modegrab').classList.toggle('active', item.mode === 'GrabFood');
+
+  // Render mode chips for this type
+  renderModeChips(item.type);
+  // Set active mode
+  editMode = item.mode || (item.type === 'Hotel' ? 'Check-in' : item.type === 'Landmark' ? 'Drive' : 'Dine-in');
+  document.querySelectorAll('#editModeChips .chip').forEach(c => {
+    const key = MODE_KEYS[c.textContent.trim()] || c.textContent.trim();
+    c.classList.toggle('active', key === editMode);
+  });
+
   document.getElementById('editOverlay').classList.add('open');
   setTimeout(() => document.getElementById('editName').focus(), 300);
 }
@@ -1411,12 +1471,71 @@ function selectChip(el, key, value) {
   chipState[key] = value;
   el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+  // Re-render mode chips when type changes in edit sheet
+  if (key === 'editType') {
+    editMode = value === 'Hotel' ? 'Check-in' : value === 'Landmark' ? 'Drive' : 'Dine-in';
+    renderModeChips(value);
+    document.querySelectorAll('#editModeChips .chip').forEach(c => {
+      const k = MODE_KEYS[c.textContent.trim()] || c.textContent.trim();
+      c.classList.toggle('active', k === editMode);
+    });
+  }
+}
+
+function selectCategory(el, cat) {
+  el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const isFood = cat === 'Food';
+  document.getElementById('editFoodTypeGroup').style.display = isFood ? 'block' : 'none';
+  document.getElementById('editPlaceTypeGroup').style.display = isFood ? 'none' : 'block';
+  // Set default type for category
+  if (isFood) {
+    chipState.editType = 'Lunch';
+    document.querySelectorAll('#editTypeChips .chip').forEach(c =>
+      c.classList.toggle('active', c.textContent.includes('Lunch'))
+    );
+    renderModeChips('Food');
+  } else {
+    chipState.editType = 'Landmark';
+    document.querySelectorAll('#editPlaceChips .chip').forEach(c =>
+      c.classList.toggle('active', c.textContent.includes('Landmark'))
+    );
+    renderModeChips('Landmark');
+  }
 }
 
 function selectMode(mode) {
   editMode = mode;
-  document.getElementById('modedinein').classList.toggle('active', mode === 'Dine-in');
-  document.getElementById('modegrab').classList.toggle('active', mode === 'GrabFood');
+  document.querySelectorAll('#editModeChips .chip').forEach(c => {
+    const txt = c.textContent.trim();
+    const key = MODE_KEYS[txt] || txt;
+    c.classList.toggle('active', key === mode);
+  });
+}
+
+function renderModeChips(type) {
+  const group = document.getElementById('editModeGroup');
+  const label = document.getElementById('editModeLabel');
+  const chipsEl = document.getElementById('editModeChips');
+
+  let modes, defaultMode;
+  if (type === 'Landmark') {
+    modes = LANDMARK_MODES; defaultMode = 'Drive';
+    label.textContent = 'Transport';
+  } else if (type === 'Hotel') {
+    modes = HOTEL_MODES; defaultMode = 'Check-in';
+    label.textContent = 'Type';
+  } else {
+    modes = FOOD_MODES; defaultMode = 'Dine-in';
+    label.textContent = 'Mode';
+  }
+
+  chipsEl.innerHTML = modes.map((m, i) => {
+    const key = MODE_KEYS[m];
+    const isActive = editMode === key || (i === 0 && !modes.map(x => MODE_KEYS[x]).includes(editMode));
+    if (isActive && !modes.map(x => MODE_KEYS[x]).includes(editMode)) editMode = key;
+    return `<button class="chip ${isActive ? 'active' : ''}" onclick="selectMode('${key}')">${m}</button>`;
+  }).join('');
 }
 
 /* ═══════════════════════════════
@@ -1446,7 +1565,9 @@ function shareWhatsApp() {
       msg += `\n*${item.time}*  ${MEAL_EMOJIS[item.type]} *${item.type}*\n`;
       msg += `📍 ${item.placeName || 'TBD'}\n`;
       if (item.mapLink) msg += `🗺 ${item.mapLink}\n`;
-      msg += `${item.mode === 'GrabFood' ? '🛵 _GrabFood delivery_' : '🍽 _Dine-in_'}\n`;
+      if (item.type === 'Landmark') msg += `${item.mode === 'Walk' ? '🚶 Walk' : '🚗 Drive'}\n`;
+      else if (item.type === 'Hotel') msg += `${item.mode === 'Check-out' ? '🧳 Check-out' : '🔑 Check-in'}\n`;
+      else msg += `${item.mode === 'GrabFood' ? '🛵 _GrabFood delivery_' : '🍽 _Dine-in_'}\n`;
       if (item.notes) msg += `💬 _${item.notes}_\n`;
     });
 
