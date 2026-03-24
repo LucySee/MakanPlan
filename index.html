@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MakanPlan</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
    GLOBAL
@@ -37,7 +39,7 @@
 html, body {
   height: 100%;
   overflow: hidden;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
 }
 
 /* ── SCREENS ── */
@@ -102,7 +104,7 @@ html, body {
 }
 
 .c-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', system-ui, sans-serif;
   font-size: 15px;
   font-weight: 800;
   color: var(--c-accent);
@@ -111,7 +113,7 @@ html, body {
 }
 
 .c-headline {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', system-ui, sans-serif;
   font-size: 30px;
   font-weight: 900;
   line-height: 1.1;
@@ -197,7 +199,7 @@ html, body {
 }
 
 .cal-month-label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', system-ui, sans-serif;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.3px;
@@ -315,7 +317,7 @@ html, body {
   border: none;
   border-radius: 16px;
   padding: 17px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', system-ui, sans-serif;
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
@@ -356,7 +358,7 @@ html, body {
 }
 
 .p-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', system-ui, sans-serif;
   font-size: 20px;
   font-weight: 800;
   color: var(--p-accent);
@@ -422,7 +424,7 @@ html, body {
 .p-timeline { padding: 0 20px; }
 
 .p-day-label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', system-ui, sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -569,7 +571,7 @@ html, body {
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .sheet-handle { width: 36px; height: 4px; background: var(--p-border); border-radius: 2px; margin: 0 auto 18px; }
-.sheet-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--p-text); }
+.sheet-title { font-family: 'Syne', system-ui, sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--p-text); }
 
 .form-group { margin-bottom: 14px; }
 .form-label { font-size: 10px; font-weight: 700; color: var(--p-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -693,7 +695,7 @@ html, body {
 .saved-delete-btn:hover { color: var(--c-accent); border-color: var(--c-accent); background: rgba(232,80,42,0.06); }
 
 .saved-trip-name {
-  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 900;
+  font-family: 'Syne', system-ui, sans-serif; font-size: 20px; font-weight: 900;
   color: var(--c-text); margin-bottom: 4px; letter-spacing: -0.5px;
 }
 .saved-trip-dates {
@@ -709,7 +711,7 @@ html, body {
   background: var(--c-accent); color: #fff;
   border: none; border-radius: 12px;
   padding: 13px;
-  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
+  font-family: 'Syne', system-ui, sans-serif; font-size: 14px; font-weight: 800;
   cursor: pointer; transition: all 0.15s;
   display: flex; align-items: center; justify-content: center; gap: 6px;
 }
@@ -744,7 +746,7 @@ html, body {
 }
 @keyframes popIn { from { transform: scale(0.88); opacity:0; } to { transform: scale(1); opacity:1; } }
 .del-confirm-icon { font-size: 36px; margin-bottom: 12px; }
-.del-confirm-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 900; color: var(--c-text); margin-bottom: 6px; }
+.del-confirm-title { font-family: 'Syne', system-ui, sans-serif; font-size: 18px; font-weight: 900; color: var(--c-text); margin-bottom: 6px; }
 .del-confirm-sub { font-size: 13px; color: var(--c-muted); margin-bottom: 20px; line-height: 1.5; }
 .del-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .del-confirm-cancel {
