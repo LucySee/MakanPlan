@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MakanPlan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   GLOBAL
+═══════════════════════════════════════════ */
+:root {
+  /* Create screen (light) */
+  --c-bg: #faf8f4;
+  --c-surface: #ffffff;
+  --c-card: #f3f0eb;
+  --c-border: #e5e0d5;
+  --c-accent: #e8502a;
+  --c-accent2: #f5a623;
+  --c-text: #1a1610;
+  --c-muted: #9e9689;
+
+  /* Planner screen (dark) */
+  --p-bg: #0f0e0c;
+  --p-surface: #1a1815;
+  --p-card: #232019;
+  --p-border: #2e2b24;
+  --p-accent: #f5a623;
+  --p-accent2: #e8502a;
+  --p-text: #f0ece3;
+  --p-muted: #7a7368;
+  --p-green: #4caf7d;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+#createScreen {
+  background: var(--c-bg);
+  color: var(--c-text);
+  z-index: 10;
+  transform: translateX(0);
+  opacity: 1;
+}
+#createScreen.slide-out {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#plannerScreen {
+  background: var(--p-bg);
+  color: var(--p-text);
+  z-index: 5;
+  transform: translateX(100%);
+  opacity: 0;
+  padding-bottom: 130px;
+}
+#plannerScreen.slide-in {
+  transform: translateX(0);
+  opacity: 1;
+  z-index: 20;
+}
+
+/* ════════════════════════════════════════
+   CREATE SCREEN
+════════════════════════════════════════ */
+.c-page { padding-bottom: 40px; }
+
+.c-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(245,166,35,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(232,80,42,0.07) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.c-inner { position: relative; z-index: 1; }
+
+.c-header {
+  padding: 36px 24px 0;
+  animation: fadeDown 0.4s ease both;
+}
+
+.c-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--c-accent);
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.c-headline {
+  font-family: 'Syne', sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 8px;
+}
+.c-headline em {
+  font-style: normal;
+  color: var(--c-accent);
+  position: relative;
+}
+.c-headline em::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 0; right: 0;
+  height: 3px;
+  background: var(--c-accent2);
+  border-radius: 2px;
+}
+
+.c-sub {
+  font-size: 14px;
+  color: var(--c-muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Trip name */
+.c-section {
+  padding: 0 24px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.4s ease both;
+  animation-delay: 0.1s;
+}
+
+.c-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.c-name-input {
+  width: 100%;
+  background: var(--c-surface);
+  border: 2px solid var(--c-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-text);
+  outline: none;
+  transition: border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.c-name-input::placeholder { color: var(--c-muted); font-weight: 400; }
+.c-name-input:focus { border-color: var(--c-accent); }
+
+/* Calendar */
+.c-cal-section {
+  padding: 0 24px;
+  animation: fadeUp 0.4s ease both;
+  animation-delay: 0.2s;
+}
+
+.c-cal-card {
+  background: var(--c-surface);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  border: 1.5px solid var(--c-border);
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.cal-month-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--c-text);
+}
+
+.cal-arrow {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-border);
+  background: transparent;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-text);
+  font-size: 16px;
+  transition: all 0.15s;
+}
+.cal-arrow:hover { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+.cal-wd {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--c-muted);
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  position: relative;
+  color: var(--c-text);
+  user-select: none;
+}
+.cal-day:hover:not(.empty):not(.past) { background: var(--c-card); }
+.cal-day.empty { pointer-events: none; }
+.cal-day.past { color: var(--c-border); pointer-events: none; }
+.cal-day.today { font-weight: 800; color: var(--c-accent2); }
+.cal-day.today::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--c-accent2);
+}
+.cal-day.sel-start, .cal-day.sel-end {
+  background: var(--c-accent) !important;
+  color: #fff !important;
+  font-weight: 700;
+  z-index: 2;
+  border-radius: 50%;
+}
+.cal-day.in-range {
+  background: rgba(232,80,42,0.1);
+  border-radius: 0;
+  color: var(--c-accent);
+  font-weight: 600;
+}
+.cal-day.sel-start.has-range { border-radius: 50% 0 0 50%; }
+.cal-day.sel-end.has-range   { border-radius: 0 50% 50% 0; }
+
+/* Date summary row */
+.date-bar {
+  margin-top: 14px;
+  padding: 13px 14px;
+  background: var(--c-card);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 50px;
+}
+.date-bar-text { font-size: 13px; font-weight: 500; color: var(--c-text); line-height: 1.4; }
+.date-bar-text strong { color: var(--c-accent); font-weight: 700; }
+.date-bar-hint { font-size: 11px; color: var(--c-muted); margin-top: 2px; }
+.days-chip {
+  background: var(--c-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 13px;
+  border-radius: 50px;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+/* CTA inline (not fixed — avoids calendar overlap) */
+.c-cta {
+  padding: 8px 24px 40px;
+}
+
+.btn-create {
+  width: 100%;
+  background: var(--c-accent);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 17px;
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 8px 24px rgba(232,80,42,0.3);
+}
+.btn-create:disabled {
+  background: var(--c-border);
+  color: var(--c-muted);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn-create:not(:disabled):hover {
+  background: #d44422;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(232,80,42,0.4);
+}
+.btn-create:not(:disabled):active { transform: scale(0.97); }
+.btn-create .arrow { font-size: 18px; transition: transform 0.2s; }
+.btn-create:not(:disabled):hover .arrow { transform: translateX(4px); }
+
+/* ════════════════════════════════════════
+   PLANNER SCREEN
+════════════════════════════════════════ */
+
+/* Header */
+.p-header {
+  padding: 18px 20px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--p-bg);
+  z-index: 100;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.p-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--p-accent);
+  letter-spacing: -0.5px;
+}
+.p-logo span { color: var(--p-text); }
+
+.p-trip-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--p-muted);
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: right;
+  width: 120px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+.p-trip-name:focus { color: var(--p-text); border-bottom: 1px solid var(--p-accent); }
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--p-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px 4px 0;
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+.back-btn:hover { color: var(--p-text); }
+
+/* Day tabs */
+.p-day-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.p-day-tabs::-webkit-scrollbar { display: none; }
+
+.p-day-tab {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  border-radius: 50px;
+  border: 1.5px solid var(--p-border);
+  background: transparent;
+  color: var(--p-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.p-day-tab.active { background: var(--p-accent); border-color: var(--p-accent); color: #000; }
+
+/* Timeline */
+.p-timeline { padding: 0 20px; }
+
+.p-day-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--p-muted);
+  text-transform: uppercase;
+  margin: 14px 0 12px;
+}
+
+.p-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--p-muted);
+}
+.p-empty .big { font-size: 48px; margin-bottom: 10px; }
+.p-empty p { font-size: 14px; line-height: 1.6; }
+
+.item-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.time-col { width: 46px; flex-shrink: 0; padding-top: 14px; text-align: right; }
+.time-text { font-size: 11px; font-weight: 600; color: var(--p-muted); line-height: 1; }
+
+.time-line { display: flex; flex-direction: column; align-items: center; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--p-accent); margin-top: 20px; flex-shrink: 0; }
+.tl-line { width: 2px; flex: 1; background: var(--p-border); min-height: 40px; margin-top: 4px; }
+
+.item-card {
+  flex: 1;
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  position: relative;
+}
+.item-card:hover { border-color: var(--p-accent); }
+.item-card:active { transform: scale(0.985); }
+
+.item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.item-type {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: var(--p-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.mode-badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 20px;
+  font-weight: 600; background: var(--p-border); color: var(--p-muted);
+}
+.mode-badge.grab { background: rgba(76,175,125,0.15); color: var(--p-green); }
+
+.item-name { font-size: 15px; font-weight: 600; color: var(--p-text); margin-bottom: 6px; line-height: 1.3; }
+.item-bottom { display: flex; align-items: center; justify-content: space-between; }
+
+.map-btn {
+  font-size: 11px; font-weight: 600; color: var(--p-accent);
+  background: rgba(245,166,35,0.1); border: none; border-radius: 6px;
+  padding: 3px 8px; cursor: pointer; text-decoration: none; display: inline-block;
+}
+.map-btn:hover { background: rgba(245,166,35,0.2); }
+.notes-text { font-size: 11px; color: var(--p-muted); font-style: italic; }
+
+.del-btn {
+  position: absolute; top: 10px; right: 10px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--p-border);
+  color: var(--p-muted); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; line-height: 1;
+}
+.del-btn:hover, .del-btn:active { background: rgba(232,80,42,0.2); color: var(--p-accent2); border-color: var(--p-accent2); }
+
+/* Bottom bar */
+.p-bottom {
+  position: fixed;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  background: var(--p-surface);
+  border-top: 1px solid var(--p-border);
+  padding: 10px 20px 22px;
+  z-index: 200;
+}
+
+.quick-btns { display: flex; gap: 6px; margin-bottom: 10px; justify-content: center; }
+.qbtn {
+  flex: 1;
+  background: var(--p-card);
+  border: 1.5px solid var(--p-border);
+  border-radius: 12px;
+  padding: 8px 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-size: 18px;
+  line-height: 1;
+}
+.qbtn:hover { border-color: var(--p-accent); background: rgba(245,166,35,0.08); transform: translateY(-2px); }
+.qbtn:active { transform: scale(0.92); }
+.qbtn span { display: block; font-size: 9px; font-weight: 600; color: var(--p-muted); margin-top: 3px; }
+
+.main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.btn-paste {
+  background: var(--p-accent); color: #000; border: none; border-radius: 12px;
+  padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-paste:hover { background: #f7b640; }
+
+.btn-share {
+  background: #25D366; color: #fff; border: none; border-radius: 12px;
+  padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-share:hover { background: #1ebe5c; }
+.btn-share:active, .btn-paste:active { transform: scale(0.97); }
+
+/* ── MODALS (shared) ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 500;
+  display: none;
+  align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.overlay.open { display: flex; }
+
+.sheet {
+  width: 100%; max-width: 430px;
+  background: var(--p-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 40px;
+  animation: slideUp 0.22s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.sheet-handle { width: 36px; height: 4px; background: var(--p-border); border-radius: 2px; margin: 0 auto 18px; }
+.sheet-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--p-text); }
+
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 10px; font-weight: 700; color: var(--p-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: block; }
+
+.form-input {
+  width: 100%; background: var(--p-card); border: 1.5px solid var(--p-border);
+  border-radius: 10px; padding: 11px 14px; color: var(--p-text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--p-accent); }
+
+.select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  padding: 7px 14px; border-radius: 50px; border: 1.5px solid var(--p-border);
+  background: transparent; color: var(--p-muted);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.chip.active { border-color: var(--p-accent); background: rgba(245,166,35,0.12); color: var(--p-accent); }
+
+.sheet-actions { display: grid; grid-template-columns: auto 1fr; gap: 8px; margin-top: 18px; }
+.btn-cancel {
+  background: var(--p-card); border: 1.5px solid var(--p-border); border-radius: 12px;
+  padding: 13px; color: var(--p-muted); font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.btn-save {
+  background: var(--p-accent); border: none; border-radius: 12px; padding: 13px;
+  color: #000; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.btn-save:hover { background: #f7b640; }
+
+.paste-hint { font-size: 11px; color: var(--p-muted); text-align: center; margin-top: 7px; line-height: 1.5; }
+
+.map-link-row { display: flex; gap: 8px; align-items: center; }
+.map-link-row .form-input { flex: 1; }
+.map-link-preview {
+  flex-shrink: 0;
+  font-size: 12px; font-weight: 700;
+  color: var(--p-accent); background: rgba(245,166,35,0.12);
+  border-radius: 8px; padding: 10px 12px;
+  text-decoration: none; white-space: nowrap;
+  border: 1px solid rgba(245,166,35,0.25);
+  transition: background 0.15s;
+}
+.map-link-preview:hover { background: rgba(245,166,35,0.22); }
+
+.btn-delete {
+  background: rgba(232,80,42,0.12); border: 1.5px solid rgba(232,80,42,0.3);
+  border-radius: 12px; padding: 13px; color: var(--p-accent2);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-delete:hover { background: rgba(232,80,42,0.22); }
+
+/* Toast */
+.toast {
+  position: fixed; top: 70px; left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--p-card); border: 1px solid var(--p-border);
+  border-radius: 50px; padding: 10px 20px;
+  font-size: 13px; font-weight: 600; color: var(--p-text);
+  z-index: 9999; opacity: 0; transition: all 0.25s; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Animations */
+@keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+
+/* ── SAVED TRIP CARD ── */
+.c-section-header {
+  padding: 0 24px 10px;
+}
+.c-section-tab {
+  font-size: 10px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--c-muted);
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
+}
+.c-section-tab.active {
+  color: var(--c-accent);
+  border-bottom-color: var(--c-accent);
+}
+
+.saved-trip-card {
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.saved-trip-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.saved-status-pill {
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px; border-radius: 50px;
+}
+.saved-status-pill.upcoming {
+  background: rgba(76,175,125,0.12); color: #3a9e6a;
+}
+.saved-status-pill.ongoing {
+  background: rgba(245,166,35,0.15); color: #c47f00;
+}
+.saved-status-pill.past {
+  background: rgba(158,150,137,0.15); color: var(--c-muted);
+}
+
+.saved-delete-btn {
+  font-size: 12px; font-weight: 600; color: var(--c-muted);
+  background: var(--c-card); border: 1px solid var(--c-border);
+  border-radius: 8px; padding: 5px 10px; cursor: pointer;
+  transition: all 0.15s;
+}
+.saved-delete-btn:hover { color: var(--c-accent); border-color: var(--c-accent); background: rgba(232,80,42,0.06); }
+
+.saved-trip-name {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 900;
+  color: var(--c-text); margin-bottom: 4px; letter-spacing: -0.5px;
+}
+.saved-trip-dates {
+  font-size: 12px; font-weight: 600; color: var(--c-accent);
+  margin-bottom: 4px;
+}
+.saved-trip-meta-row {
+  font-size: 12px; color: var(--c-muted); margin-bottom: 14px;
+}
+
+.saved-open-btn {
+  width: 100%;
+  background: var(--c-accent); color: #fff;
+  border: none; border-radius: 12px;
+  padding: 13px;
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.saved-open-btn:hover { background: #d44422; }
+.saved-open-btn:active { transform: scale(0.98); }
+
+.section-divider {
+  display: flex; align-items: center; gap: 10px; color: var(--c-muted);
+}
+.section-divider::before, .section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--c-border);
+}
+.section-divider span { font-size: 11px; font-weight: 700; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; }
+
+/* Delete confirm overlay */
+.del-confirm-overlay {
+  position: fixed; inset: 0; z-index: 600;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.del-confirm-overlay.open { display: flex; }
+.del-confirm-box {
+  background: var(--c-surface);
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%; max-width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: popIn 0.2s ease;
+}
+@keyframes popIn { from { transform: scale(0.88); opacity:0; } to { transform: scale(1); opacity:1; } }
+.del-confirm-icon { font-size: 36px; margin-bottom: 12px; }
+.del-confirm-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 900; color: var(--c-text); margin-bottom: 6px; }
+.del-confirm-sub { font-size: 13px; color: var(--c-muted); margin-bottom: 20px; line-height: 1.5; }
+.del-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.del-confirm-cancel {
+  background: var(--c-card); border: 1.5px solid var(--c-border);
+  border-radius: 12px; padding: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--c-muted); cursor: pointer;
+}
+.del-confirm-ok {
+  background: #e8502a; border: none; border-radius: 12px; padding: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
+  transition: background 0.15s;
+}
+.del-confirm-ok:hover { background: #c73f1e; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     SCREEN 1 — CREATE TRIP
+════════════════════════════════ -->
+<div class="screen" id="createScreen">
+  <div class="c-page">
+    <div class="c-inner">
+      <div class="c-header">
+        <div class="c-logo">🍜 MakanPlan</div>
+        <div class="c-headline">Plan your<br><em>food trip</em></div>
+        <div class="c-sub">Pick dates, name it, start adding<br>your makan stops.</div>
+      </div>
+
+      <!-- ── SAVED TRIP SECTION ── -->
+      <div id="savedTripSection" style="display:none">
+        <div class="c-section-header">
+          <span class="c-section-tab active">Saved Trip</span>
+        </div>
+        <div class="c-section">
+          <div class="saved-trip-card">
+            <div class="saved-trip-top">
+              <div class="saved-status-pill" id="savedStatusPill">—</div>
+              <button class="saved-delete-btn" onclick="confirmDeleteTrip()">🗑 Delete</button>
+            </div>
+            <div class="saved-trip-name" id="existingTripName">—</div>
+            <div class="saved-trip-dates" id="savedTripDates">—</div>
+            <div class="saved-trip-meta" id="existingTripMeta">—</div>
+            <button class="saved-open-btn" onclick="resumeTrip()">Open Trip →</button>
+          </div>
+        </div>
+
+        <div class="c-section">
+          <div class="section-divider"><span>New Trip</span></div>
+        </div>
+      </div>
+
+      <!-- ── NEW TRIP SECTION ── -->
+      <div class="c-section">
+        <span class="c-label">Trip Name</span>
+        <input class="c-name-input" id="cTripName" type="text" placeholder="e.g. KL Food Crawl 🌶️" maxlength="40" />
+      </div>
+
+      <div class="c-cal-section">
+        <span class="c-label" style="display:block;margin-bottom:10px">Select Dates</span>
+        <div class="c-cal-card">
+          <div class="cal-nav">
+            <button class="cal-arrow" onclick="calPrev()">‹</button>
+            <div class="cal-month-label" id="calMonthLabel">—</div>
+            <button class="cal-arrow" onclick="calNext()">›</button>
+          </div>
+          <div class="cal-weekdays">
+            <div class="cal-wd">Su</div><div class="cal-wd">Mo</div>
+            <div class="cal-wd">Tu</div><div class="cal-wd">We</div>
+            <div class="cal-wd">Th</div><div class="cal-wd">Fr</div>
+            <div class="cal-wd">Sa</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="date-bar" id="dateBar">
+            <div>
+              <div class="date-bar-text" id="dateBarText">Tap a date to begin</div>
+              <div class="date-bar-hint" id="dateBarHint">Select your first day</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-cta">
+    <button class="btn-create" id="createBtn" disabled onclick="doCreateTrip()">
+      Choose dates to continue <span class="arrow">→</span>
+    </button>
+  </div>
+
+  <!-- DELETE CONFIRM OVERLAY -->
+  <div class="del-confirm-overlay" id="delConfirmOverlay">
+    <div class="del-confirm-box">
+      <div class="del-confirm-icon">🗑</div>
+      <div class="del-confirm-title">Delete this trip?</div>
+      <div class="del-confirm-sub" id="delConfirmSub">This cannot be undone.</div>
+      <div class="del-confirm-actions">
+        <button class="del-confirm-cancel" onclick="document.getElementById('delConfirmOverlay').classList.remove('open')">Cancel</button>
+        <button class="del-confirm-ok" onclick="doDeleteTrip()">Yes, delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SCREEN 2 — PLANNER
+════════════════════════════════ -->
+<div class="screen" id="plannerScreen">
+
+  <div class="p-header">
+    <button class="back-btn" onclick="goBack()">← New Trip</button>
+    <div class="p-logo">Makan<span>Plan</span></div>
+    <input class="p-trip-name" id="pTripName" type="text" value="" />
+  </div>
+
+  <div class="p-day-tabs" id="pDayTabs"></div>
+
+  <div class="p-timeline">
+    <div class="p-day-label" id="pDayLabel"></div>
+    <div id="pItemList"></div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="p-bottom">
+    <div class="quick-btns">
+      <button class="qbtn" onclick="quickAdd('Breakfast')">☕<span>Bfast</span></button>
+      <button class="qbtn" onclick="quickAdd('Lunch')">🍜<span>Lunch</span></button>
+      <button class="qbtn" onclick="quickAdd('Cafe')">🧋<span>Cafe</span></button>
+      <button class="qbtn" onclick="quickAdd('Dinner')">🍽<span>Dinner</span></button>
+      <button class="qbtn" onclick="quickAdd('Snack')">🍡<span>Snack</span></button>
+    </div>
+    <div class="main-actions">
+      <button class="btn-paste" onclick="openPasteModal()">🔗 Paste Link</button>
+      <button class="btn-share" onclick="shareWhatsApp()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PASTE MODAL
+════════════════════════════════ -->
+<div class="overlay" id="pasteOverlay" onclick="maybeCloseOverlay(event,'pasteOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📍 Add from Link</div>
+    <div class="form-group">
+      <label class="form-label">Google Maps Link</label>
+      <input class="form-input" id="mapLinkInput" type="url" placeholder="Paste maps.google.com link here" />
+      <p class="paste-hint">Paste any Google Maps link → place added instantly</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Place Name (optional)</label>
+      <input class="form-input" id="pasteNameInput" type="text" placeholder="e.g. Nasi Kandar Pelita" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Meal Type</label>
+      <div class="chip-group" id="pasteTypeChips">
+        <button class="chip" onclick="selectChip(this,'pasteType','Breakfast')">☕ Breakfast</button>
+        <button class="chip active" onclick="selectChip(this,'pasteType','Lunch')">🍜 Lunch</button>
+        <button class="chip" onclick="selectChip(this,'pasteType','Cafe')">🧋 Cafe</button>
+        <button class="chip" onclick="selectChip(this,'pasteType','Dinner')">🍽 Dinner</button>
+        <button class="chip" onclick="selectChip(this,'pasteType','Snack')">🍡 Snack</button>
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn-cancel" onclick="closeOverlay('pasteOverlay')">Cancel</button>
+      <button class="btn-save" onclick="addFromLink()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     EDIT MODAL
+════════════════════════════════ -->
+<div class="overlay" id="editOverlay" onclick="maybeCloseOverlay(event,'editOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">✏️ Edit Item</div>
+    <div class="select-row">
+      <div class="form-group">
+        <label class="form-label">Time</label>
+        <input class="form-input" id="editTime" type="time" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Place Name</label>
+        <input class="form-input" id="editName" type="text" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Meal Type</label>
+      <div class="chip-group" id="editTypeChips">
+        <button class="chip" onclick="selectChip(this,'editType','Breakfast')">☕ Breakfast</button>
+        <button class="chip" onclick="selectChip(this,'editType','Lunch')">🍜 Lunch</button>
+        <button class="chip" onclick="selectChip(this,'editType','Cafe')">🧋 Cafe</button>
+        <button class="chip" onclick="selectChip(this,'editType','Dinner')">🍽 Dinner</button>
+        <button class="chip" onclick="selectChip(this,'editType','Snack')">🍡 Snack</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mode</label>
+      <div class="chip-group">
+        <button class="chip active" id="modedinein" onclick="selectMode('Dine-in')">🍽 Dine-in</button>
+        <button class="chip" id="modegrab" onclick="selectMode('GrabFood')">🛵 GrabFood</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Google Maps Link</label>
+      <div class="map-link-row">
+        <input class="form-input" id="editMapLink" type="url" placeholder="Paste maps.google.com link" />
+        <a class="map-link-preview" id="mapLinkPreview" href="#" target="_blank" style="display:none">Open 📍</a>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="editNotes" type="text" placeholder="e.g. try the roti canai" />
+    </div>
+    <div class="sheet-actions">
+      <button class="btn-delete" onclick="deleteFromEdit()">🗑 Delete</button>
+      <button class="btn-save" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════
+   CALENDAR
+═══════════════════════════════ */
+const todayDate = new Date();
+todayDate.setHours(0,0,0,0);
+let calYear = todayDate.getFullYear();
+let calMonth = todayDate.getMonth();
+let selStart = null, selEnd = null;
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function toKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function renderCal() {
+  document.getElementById('calMonthLabel').textContent = `${MONTHS[calMonth]} ${calYear}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+
+  for (let i = 0; i < first.getDay(); i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day empty';
+    grid.appendChild(e);
+  }
+
+  const sk = selStart ? toKey(selStart) : null;
+  const ek = selEnd   ? toKey(selEnd)   : null;
+
+  for (let d = 1; d <= last.getDate(); d++) {
+    const date = new Date(calYear, calMonth, d);
+    const key = toKey(date);
+    const isPast = date < todayDate;
+    const isToday = key === toKey(todayDate);
+
+    let cls = 'cal-day';
+    if (isPast) cls += ' past';
+    if (isToday) cls += ' today';
+    if (key === sk) cls += ' sel-start' + (ek && key !== ek ? ' has-range' : '');
+    if (key === ek) cls += ' sel-end'   + (sk && key !== sk ? ' has-range' : '');
+    if (sk && ek && key > sk && key < ek) cls += ' in-range';
+
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = d;
+    el.onclick = () => pickDay(date);
+    grid.appendChild(el);
+  }
+}
+
+function pickDay(date) {
+  if (date < todayDate) return;
+  if (!selStart || (selStart && selEnd)) {
+    selStart = date; selEnd = null;
+  } else if (date < selStart) {
+    selStart = date; selEnd = null;
+  } else {
+    selEnd = date;
+  }
+  renderCal();
+  updateDateBar();
+  updateCreateBtn();
+}
+
+function calPrev() {
+  calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCal();
+}
+function calNext() {
+  calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCal();
+}
+
+function fmt(d) { return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' }); }
+
+function updateDateBar() {
+  const textEl = document.getElementById('dateBarText');
+  const hintEl = document.getElementById('dateBarHint');
+  const bar = document.getElementById('dateBar');
+  const oldChip = bar.querySelector('.days-chip');
+  if (oldChip) oldChip.remove();
+
+  if (!selStart) {
+    textEl.innerHTML = 'Tap a date to begin';
+    hintEl.textContent = 'Select your first day';
+    return;
+  }
+  if (selStart && !selEnd) {
+    textEl.innerHTML = `<strong>${fmt(selStart)}</strong>`;
+    hintEl.textContent = 'Now tap your last day';
+    return;
+  }
+  const days = Math.round((selEnd - selStart) / 86400000) + 1;
+  textEl.innerHTML = `<strong>${fmt(selStart)}</strong> → <strong>${fmt(selEnd)}</strong>`;
+  hintEl.textContent = '';
+  const chip = document.createElement('div');
+  chip.className = 'days-chip';
+  chip.textContent = `${days}D`;
+  bar.appendChild(chip);
+}
+
+function updateCreateBtn() {
+  const btn = document.getElementById('createBtn');
+  if (!selStart) {
+    btn.disabled = true;
+    btn.innerHTML = 'Choose dates to continue <span class="arrow">→</span>';
+    return;
+  }
+  const end = selEnd || selStart;
+  const days = Math.round((end - selStart) / 86400000) + 1;
+  btn.disabled = false;
+  btn.innerHTML = `Create ${days}-Day Trip <span class="arrow">→</span>`;
+}
+
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
+let state = { tripName: '', currentDay: 0, days: [] };
+const MEAL_EMOJIS = { Breakfast:'☕', Lunch:'🍜', Cafe:'🧋', Dinner:'🍽', Snack:'🍡' };
+const MEAL_TIMES  = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'19:00', Snack:'17:00' };
+let editingId = null;
+let chipState = { editType:'Lunch', pasteType:'Lunch' };
+let editMode = 'Dine-in';
+
+function saveState() { localStorage.setItem('makanplan_v2', JSON.stringify(state)); }
+
+/* ═══════════════════════════════
+   SCREEN TRANSITIONS
+═══════════════════════════════ */
+function doCreateTrip() {
+  const nameInput = document.getElementById('cTripName').value.trim();
+  const s = selStart;
+  const e = selEnd || selStart;
+  const days = Math.round((e - s) / 86400000) + 1;
+  const tripName = nameInput || `${fmt(s)} Makan Trip`;
+
+  const dayArr = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(s);
+    d.setDate(d.getDate() + i);
+    dayArr.push({
+      date: `Day ${i+1} · ${d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}`,
+      items: []
+    });
+  }
+
+  state = { tripName, currentDay: 0, days: dayArr };
+  saveState();
+
+  document.getElementById('pTripName').value = tripName;
+  renderPlannerDayTabs();
+  renderPlannerTimeline();
+
+  document.getElementById('createScreen').classList.add('slide-out');
+  document.getElementById('plannerScreen').classList.add('slide-in');
+}
+
+function goBack() {
+  document.getElementById('createScreen').classList.remove('slide-out');
+  document.getElementById('plannerScreen').classList.remove('slide-in');
+  showExistingTripBanner();
+}
+
+function resumeTrip() {
+  document.getElementById('createScreen').classList.add('slide-out');
+  document.getElementById('plannerScreen').classList.add('slide-in');
+}
+
+function showExistingTripBanner() {
+  const saved = localStorage.getItem('makanplan_v2');
+  const section = document.getElementById('savedTripSection');
+  if (!saved) { section.style.display = 'none'; return; }
+
+  const trip = JSON.parse(saved);
+  const totalItems = trip.days.reduce((sum, d) => sum + d.items.length, 0);
+
+  // Parse dates from day labels e.g. "Day 1 · Fri 17 Apr"
+  const firstDayLabel = trip.days[0]?.date || '';
+  const lastDayLabel  = trip.days[trip.days.length - 1]?.date || '';
+
+  // Extract date string after "· "
+  function parseLabel(label) {
+    const m = label.match(/·\s(.+)/);
+    if (!m) return null;
+    // e.g. "Fri 17 Apr" → parse
+    return new Date(m[1] + ' ' + new Date().getFullYear());
+  }
+
+  const startD = parseLabel(firstDayLabel);
+  const endD   = parseLabel(lastDayLabel);
+  const now    = new Date(); now.setHours(0,0,0,0);
+
+  // Status
+  let statusText = '📅 Trip';
+  let statusClass = 'upcoming';
+  let datesLine = '';
+
+  if (startD && endD) {
+    const fmtD = d => d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    datesLine = `${fmtD(startD)}${trip.days.length > 1 ? ' → ' + fmtD(endD) : ''}`;
+
+    if (endD < now) {
+      statusText = '✓ Past trip';
+      statusClass = 'past';
+      const daysAgo = Math.round((now - endD) / 86400000);
+      datesLine += ` · ${daysAgo === 0 ? 'ended today' : daysAgo + ' days ago'}`;
+    } else if (startD <= now) {
+      statusText = '🔥 Ongoing';
+      statusClass = 'ongoing';
+      const daysLeft = Math.round((endD - now) / 86400000);
+      datesLine += ` · ${daysLeft === 0 ? 'ends today' : daysLeft + ' day' + (daysLeft>1?'s':'') + ' left'}`;
+    } else {
+      statusText = '🗓 Upcoming';
+      statusClass = 'upcoming';
+      const daysTo = Math.round((startD - now) / 86400000);
+      datesLine += ` · in ${daysTo} day${daysTo !== 1 ? 's' : ''}`;
+    }
+  }
+
+  document.getElementById('existingTripName').textContent = trip.tripName || 'My Makan Trip';
+  document.getElementById('savedTripDates').textContent = datesLine;
+  document.getElementById('existingTripMeta').textContent =
+    `${trip.days.length} day${trip.days.length > 1 ? 's' : ''} · ${totalItems} stop${totalItems !== 1 ? 's' : ''}`;
+  document.getElementById('existingTripMeta').className = 'saved-trip-meta-row';
+
+  const pill = document.getElementById('savedStatusPill');
+  pill.textContent = statusText;
+  pill.className = `saved-status-pill ${statusClass}`;
+
+  // Update delete confirm sub text
+  document.getElementById('delConfirmSub').textContent =
+    `"${trip.tripName || 'My Makan Trip'}" and all ${totalItems} stop${totalItems!==1?'s':''} will be removed. This cannot be undone.`;
+
+  section.style.display = 'block';
+}
+
+function confirmDeleteTrip() {
+  document.getElementById('delConfirmOverlay').classList.add('open');
+}
+
+function doDeleteTrip() {
+  localStorage.removeItem('makanplan_v2');
+  state = { tripName: '', currentDay: 0, days: [] };
+  document.getElementById('delConfirmOverlay').classList.remove('open');
+  document.getElementById('savedTripSection').style.display = 'none';
+  showToast('🗑 Trip deleted');
+}
+
+/* ═══════════════════════════════
+   PLANNER RENDER
+═══════════════════════════════ */
+function renderPlannerDayTabs() {
+  const tabs = document.getElementById('pDayTabs');
+  tabs.innerHTML = '';
+  state.days.forEach((day, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'p-day-tab' + (i === state.currentDay ? ' active' : '');
+    btn.textContent = day.date;
+    btn.onclick = () => switchDay(i);
+    tabs.appendChild(btn);
+  });
+}
+
+function renderPlannerTimeline() {
+  const day = state.days[state.currentDay];
+  document.getElementById('pDayLabel').textContent = day.date;
+  const list = document.getElementById('pItemList');
+
+  if (day.items.length === 0) {
+    list.innerHTML = `<div class="p-empty"><div class="big">🍜</div><p>No food stops yet.<br>Tap a meal button to start!</p></div>`;
+    return;
+  }
+
+  const sorted = [...day.items].sort((a,b) => a.time.localeCompare(b.time));
+  list.innerHTML = sorted.map((item, i) => {
+    const isLast = i === sorted.length - 1;
+    return `
+    <div class="item-row">
+      <div class="time-col"><div class="time-text">${item.time}</div></div>
+      <div class="time-line">
+        <div class="dot"></div>
+        ${!isLast ? '<div class="tl-line"></div>' : ''}
+      </div>
+      <div class="item-card" onclick="openEdit('${item.id}')">
+        <button class="del-btn" onclick="deleteItem(event,'${item.id}')">×</button>
+        <div class="item-top">
+          <div class="item-type">${MEAL_EMOJIS[item.type]} ${item.type}</div>
+          <span class="mode-badge ${item.mode==='GrabFood'?'grab':''}">${item.mode==='GrabFood'?'🛵 GrabFood':'🍽 Dine-in'}</span>
+        </div>
+        <div class="item-name">${item.placeName || '<span style="color:var(--p-muted)">Add place name</span>'}</div>
+        <div class="item-bottom">
+          ${item.mapLink ? `<a class="map-btn" href="${item.mapLink}" target="_blank" onclick="event.stopPropagation()">📍 Maps</a>` : '<span></span>'}
+          ${item.notes ? `<span class="notes-text">${item.notes}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function switchDay(i) {
+  state.currentDay = i;
+  renderPlannerDayTabs();
+  renderPlannerTimeline();
+}
+
+/* ═══════════════════════════════
+   ITEMS
+═══════════════════════════════ */
+function getDefaultTime(type) {
+  const day = state.days[state.currentDay];
+  if (day.items.length > 0) {
+    const sorted = [...day.items].sort((a,b) => b.time.localeCompare(a.time));
+    const [h, m] = sorted[0].time.split(':').map(Number);
+    const next = Math.min(h + 3, 23);
+    return `${String(next).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  }
+  return MEAL_TIMES[type] || '12:00';
+}
+
+function quickAdd(type) {
+  state.days[state.currentDay].items.push({
+    id: Date.now().toString(), time: getDefaultTime(type),
+    type, placeName: '', mapLink: '', mode: 'Dine-in', notes: ''
+  });
+  saveState(); renderPlannerTimeline();
+  showToast(`${MEAL_EMOJIS[type]} ${type} added`);
+}
+
+function openPasteModal() {
+  document.getElementById('mapLinkInput').value = '';
+  document.getElementById('pasteNameInput').value = '';
+  chipState.pasteType = 'Lunch';
+  document.querySelectorAll('#pasteTypeChips .chip').forEach(c =>
+    c.classList.toggle('active', c.textContent.includes('Lunch'))
+  );
+  document.getElementById('pasteOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('mapLinkInput').focus(), 300);
+}
+
+function addFromLink() {
+  const link = document.getElementById('mapLinkInput').value.trim();
+  const nameInput = document.getElementById('pasteNameInput').value.trim();
+  const type = chipState.pasteType || 'Lunch';
+  let placeName = nameInput;
+  if (!placeName && link) {
+    const m = link.match(/place\/([^/@?]+)/);
+    if (m) placeName = decodeURIComponent(m[1].replace(/\+/g,' '));
+  }
+  state.days[state.currentDay].items.push({
+    id: Date.now().toString(), time: getDefaultTime(type),
+    type, placeName: placeName || '', mapLink: link, mode: 'Dine-in', notes: ''
+  });
+  saveState(); closeOverlay('pasteOverlay'); renderPlannerTimeline();
+  showToast(`📍 ${placeName || type} added`);
+}
+
+function openEdit(id) {
+  const item = state.days[state.currentDay].items.find(i => i.id === id);
+  if (!item) return;
+  editingId = id;
+  document.getElementById('editTime').value = item.time;
+  document.getElementById('editName').value = item.placeName;
+  document.getElementById('editNotes').value = item.notes || '';
+  document.getElementById('editMapLink').value = item.mapLink || '';
+  // Show/hide preview link
+  const preview = document.getElementById('mapLinkPreview');
+  if (item.mapLink) { preview.href = item.mapLink; preview.style.display = 'inline-block'; }
+  else { preview.style.display = 'none'; }
+  // Live update preview as user types
+  document.getElementById('editMapLink').oninput = function() {
+    if (this.value.trim()) { preview.href = this.value.trim(); preview.style.display = 'inline-block'; }
+    else { preview.style.display = 'none'; }
+  };
+  chipState.editType = item.type;
+  editMode = item.mode;
+  document.querySelectorAll('#editTypeChips .chip').forEach(c =>
+    c.classList.toggle('active', c.textContent.includes(item.type))
+  );
+  document.getElementById('modedinein').classList.toggle('active', item.mode === 'Dine-in');
+  document.getElementById('modegrab').classList.toggle('active', item.mode === 'GrabFood');
+  document.getElementById('editOverlay').classList.add('open');
+}
+
+function saveEdit() {
+  const item = state.days[state.currentDay].items.find(i => i.id === editingId);
+  if (!item) return;
+  item.time = document.getElementById('editTime').value;
+  item.placeName = document.getElementById('editName').value.trim();
+  item.notes = document.getElementById('editNotes').value.trim();
+  item.mapLink = document.getElementById('editMapLink').value.trim();
+  item.type = chipState.editType;
+  item.mode = editMode;
+  saveState(); closeOverlay('editOverlay'); renderPlannerTimeline();
+  showToast('✅ Saved');
+}
+
+function deleteFromEdit() {
+  state.days[state.currentDay].items = state.days[state.currentDay].items.filter(i => i.id !== editingId);
+  saveState(); closeOverlay('editOverlay'); renderPlannerTimeline();
+  showToast('🗑 Removed');
+}
+
+function deleteItem(e, id) {
+  e.stopPropagation();
+  state.days[state.currentDay].items = state.days[state.currentDay].items.filter(i => i.id !== id);
+  saveState(); renderPlannerTimeline();
+  showToast('Removed');
+}
+
+/* ═══════════════════════════════
+   CHIPS / MODE
+═══════════════════════════════ */
+function selectChip(el, key, value) {
+  chipState[key] = value;
+  el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function selectMode(mode) {
+  editMode = mode;
+  document.getElementById('modedinein').classList.toggle('active', mode === 'Dine-in');
+  document.getElementById('modegrab').classList.toggle('active', mode === 'GrabFood');
+}
+
+/* ═══════════════════════════════
+   OVERLAYS
+═══════════════════════════════ */
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+function maybeCloseOverlay(e, id) { if (e.target === document.getElementById(id)) closeOverlay(id); }
+
+/* ═══════════════════════════════
+   WHATSAPP
+═══════════════════════════════ */
+function shareWhatsApp() {
+  const tripName = state.tripName || 'My Makan Trip';
+  let msg = '';
+  msg += `🍜 *${tripName.toUpperCase()}*\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  let hasItems = false;
+  state.days.forEach((day, di) => {
+    if (!day.items.length) return;
+    hasItems = true;
+
+    msg += `📅 *${day.date.toUpperCase()}*\n`;
+    msg += `─────────────────────\n`;
+
+    [...day.items].sort((a,b) => a.time.localeCompare(b.time)).forEach((item, idx) => {
+      msg += `\n*${item.time}*  ${MEAL_EMOJIS[item.type]} *${item.type}*\n`;
+      msg += `📍 ${item.placeName || 'TBD'}\n`;
+      if (item.mapLink) msg += `🗺 ${item.mapLink}\n`;
+      msg += `${item.mode === 'GrabFood' ? '🛵 _GrabFood delivery_' : '🍽 _Dine-in_'}\n`;
+      if (item.notes) msg += `💬 _${item.notes}_\n`;
+    });
+
+    msg += `\n`;
+  });
+
+  if (!hasItems) { showToast('Add some food stops first!'); return; }
+  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+  msg += `_Planned with MakanPlan 🍜_`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+/* ═══════════════════════════════
+   TOAST
+═══════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.getElementById('pTripName').addEventListener('change', e => {
+  state.tripName = e.target.value;
+  saveState();
+});
+
+/* ═══════════════════════════════
+   INIT
+═══════════════════════════════ */
+renderCal();
+
+// Load saved state into planner but always start on create screen
+const saved = localStorage.getItem('makanplan_v2');
+if (saved) {
+  state = JSON.parse(saved);
+  document.getElementById('pTripName').value = state.tripName;
+  renderPlannerDayTabs();
+  renderPlannerTimeline();
+}
+
+showExistingTripBanner();
+</script>
+</body>
+</html>
