@@ -2,7 +2,7 @@
 
 A food-first trip planner built for real travel usage. Plan your meals, share your itinerary to WhatsApp in seconds.
 
-**🔗 Live Demo → [lucysee.github.io/makanplan](https://lucysee.github.io/makanplan/)**
+**🔗 Live Demo → [lucysee.github.io/makanplan](https://lucysee.github.io/MakanPlan/)**
 
 ---
 ---
