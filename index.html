@@ -894,15 +894,14 @@ html, body {
 <div class="overlay" id="pasteOverlay" onclick="maybeCloseOverlay(event,'pasteOverlay')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">📍 Add from Link</div>
+    <div class="sheet-title">➕ Add Stop</div>
     <div class="form-group">
-      <label class="form-label">Google Maps Link</label>
-      <input class="form-input" id="mapLinkInput" type="url" placeholder="Paste maps.google.com link here" />
-      <p class="paste-hint">Paste any Google Maps link → place added instantly</p>
+      <label class="form-label">Place Name</label>
+      <input class="form-input" id="pasteNameInput" type="text" placeholder="e.g. Nasi Kandar Pelita" />
     </div>
     <div class="form-group">
-      <label class="form-label">Place Name (optional)</label>
-      <input class="form-input" id="pasteNameInput" type="text" placeholder="e.g. Nasi Kandar Pelita" />
+      <label class="form-label">Google Maps Link <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--p-muted)">(optional)</span></label>
+      <input class="form-input" id="mapLinkInput" type="url" placeholder="Paste maps.app.goo.gl/… link" />
     </div>
     <div class="form-group">
       <label class="form-label">Meal Type</label>
@@ -1297,12 +1296,28 @@ function getDefaultTime(type) {
 }
 
 function quickAdd(type) {
+  const id = Date.now().toString();
   state.days[state.currentDay].items.push({
-    id: Date.now().toString(), time: getDefaultTime(type),
+    id, time: getDefaultTime(type),
     type, placeName: '', mapLink: '', mode: 'Dine-in', notes: ''
   });
-  saveState(); renderPlannerTimeline();
-  showToast(`${MEAL_EMOJIS[type]} ${type} added`);
+  saveState();
+  renderPlannerTimeline();
+  // Open edit sheet immediately so user can fill in place name
+  openEdit(id);
+}
+
+function extractPlaceName(url) {
+  try {
+    let m = url.match(/\/maps\/place\/([^\/@?&#]+)/);
+    if (m) {
+      const name = decodeURIComponent(m[1].replace(/\+/g, ' ')).trim();
+      if (name && name.length > 1) return name;
+    }
+    m = url.match(/[?&]q=([^&]+)/);
+    if (m) return decodeURIComponent(m[1].replace(/\+/g, ' ')).trim();
+    return '';
+  } catch(e) { return ''; }
 }
 
 function openPasteModal() {
@@ -1312,19 +1327,21 @@ function openPasteModal() {
   document.querySelectorAll('#pasteTypeChips .chip').forEach(c =>
     c.classList.toggle('active', c.textContent.includes('Lunch'))
   );
+  document.getElementById('mapLinkInput').oninput = function() {
+    const extracted = extractPlaceName(this.value.trim());
+    if (extracted && !document.getElementById('pasteNameInput').value) {
+      document.getElementById('pasteNameInput').value = extracted;
+    }
+  };
   document.getElementById('pasteOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('mapLinkInput').focus(), 300);
+  setTimeout(() => document.getElementById('pasteNameInput').focus(), 300);
 }
 
 function addFromLink() {
   const link = document.getElementById('mapLinkInput').value.trim();
-  const nameInput = document.getElementById('pasteNameInput').value.trim();
+  const placeName = document.getElementById('pasteNameInput').value.trim();
   const type = chipState.pasteType || 'Lunch';
-  let placeName = nameInput;
-  if (!placeName && link) {
-    const m = link.match(/place\/([^/@?]+)/);
-    if (m) placeName = decodeURIComponent(m[1].replace(/\+/g,' '));
-  }
+  if (!placeName && !link) { showToast('Add a place name or link'); return; }
   state.days[state.currentDay].items.push({
     id: Date.now().toString(), time: getDefaultTime(type),
     type, placeName: placeName || '', mapLink: link, mode: 'Dine-in', notes: ''
@@ -1358,6 +1375,7 @@ function openEdit(id) {
   document.getElementById('modedinein').classList.toggle('active', item.mode === 'Dine-in');
   document.getElementById('modegrab').classList.toggle('active', item.mode === 'GrabFood');
   document.getElementById('editOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('editName').focus(), 300);
 }
 
 function saveEdit() {
