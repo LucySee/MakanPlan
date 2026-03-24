@@ -5,11 +5,6 @@ A food-first trip planner built for real travel usage. Plan your meals, share yo
 **🔗 Live Demo → [lucysee.github.io/makanplan](https://lucysee.github.io/makanplan/)**
 
 ---
-
-## How to Use
-
-Open `makanplan.html` in any mobile browser. No installation. No login. Works offline.
-
 ---
 
 ## App Flow
