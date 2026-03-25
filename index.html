@@ -424,13 +424,15 @@ html, body {
 .p-timeline { padding: 0 20px; }
 
 .p-day-label {
-  'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--p-muted);
   text-transform: uppercase;
   margin: 14px 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--p-border);
 }
 
 .p-empty {
@@ -1584,7 +1586,7 @@ function prepareShare(anchor) {
     if (!day.items.length) return;
     hasItems = true;
 
-    msg += `📅 *${day.date.toUpperCase()}*\n`;
+    msg += `\n\n📅 *${day.date.toUpperCase()}*\n`;
     msg += `─────────────────────\n`;
 
     [...day.items].sort((a,b) => a.time.localeCompare(b.time)).forEach(item => {
