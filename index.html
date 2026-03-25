@@ -626,7 +626,15 @@ html, body {
 }
 .btn-save:hover { background: #f7b640; }
 
-.paste-hint { font-size: 11px; color: var(--p-muted); text-align: center; margin-top: 7px; line-height: 1.5; }
+.settings-btn {
+  background: none; border: none; font-size: 18px; cursor: pointer;
+  padding: 2px; line-height: 1; opacity: 0.7; transition: opacity 0.15s;
+}
+.settings-btn:hover { opacity: 1; }
+.settings-grid { display: flex; flex-direction: column; gap: 10px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.settings-label { font-size: 13px; font-weight: 600; color: var(--p-text); flex: 1; }
+.settings-time { width: 120px; flex-shrink: 0; padding: 8px 12px; font-size: 14px; }
 
 .map-link-row { display: flex; gap: 8px; align-items: center; }
 .map-link-row .form-input { flex: 1; }
@@ -880,7 +888,10 @@ html, body {
   <div class="p-header">
     <button class="back-btn" onclick="goBack()">← Back</button>
     <div class="p-logo">Makan<span>Plan</span></div>
-    <input class="p-trip-name" id="pTripName" type="text" value="" />
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+      <input class="p-trip-name" id="pTripName" type="text" value="" />
+    </div>
   </div>
 
   <div class="p-day-tabs" id="pDayTabs"></div>
@@ -943,6 +954,30 @@ html, body {
     <div class="sheet-actions">
       <button class="btn-cancel" onclick="closeOverlay('pasteOverlay')">Cancel</button>
       <button class="btn-save" onclick="addFromLink()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SETTINGS MODAL
+════════════════════════════════ -->
+<div class="overlay" id="settingsOverlay" onclick="maybeCloseOverlay(event,'settingsOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙️ Default Times</div>
+    <div class="settings-grid">
+      <div class="settings-row"><label class="settings-label">☕ Breakfast</label><input class="form-input settings-time" type="time" id="st-Breakfast" /></div>
+      <div class="settings-row"><label class="settings-label">🍜 Lunch</label><input class="form-input settings-time" type="time" id="st-Lunch" /></div>
+      <div class="settings-row"><label class="settings-label">🧋 Cafe</label><input class="form-input settings-time" type="time" id="st-Cafe" /></div>
+      <div class="settings-row"><label class="settings-label">🍽 Dinner</label><input class="form-input settings-time" type="time" id="st-Dinner" /></div>
+      <div class="settings-row"><label class="settings-label">🍡 Snack</label><input class="form-input settings-time" type="time" id="st-Snack" /></div>
+      <div class="settings-row"><label class="settings-label">📸 Landmark</label><input class="form-input settings-time" type="time" id="st-Landmark" /></div>
+      <div class="settings-row"><label class="settings-label">🔑 Hotel Check-in</label><input class="form-input settings-time" type="time" id="st-Hotel" /></div>
+      <div class="settings-row"><label class="settings-label">🧳 Hotel Check-out</label><input class="form-input settings-time" type="time" id="st-HotelOut" /></div>
+    </div>
+    <div class="sheet-actions" style="grid-template-columns:1fr 1fr;margin-top:18px">
+      <button class="btn-cancel" onclick="closeOverlay('settingsOverlay')">Cancel</button>
+      <button class="btn-save" onclick="saveSettings()">Save</button>
     </div>
   </div>
 </div>
@@ -1126,7 +1161,8 @@ function updateCreateBtn() {
 ═══════════════════════════════ */
 let state = { tripName: '', currentDay: 0, days: [] };
 const MEAL_EMOJIS = { Breakfast:'☕', Lunch:'🍜', Cafe:'🧋', Dinner:'🍽', Snack:'🍡', Landmark:'📸', Hotel:'🏨' };
-const MEAL_TIMES  = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'18:00', Snack:'17:00', Landmark:'10:00', Hotel:'15:00' };
+const DEFAULT_TIMES = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'18:00', Snack:'17:00', Landmark:'10:00', Hotel:'15:00', HotelOut:'12:00' };
+let MEAL_TIMES = Object.assign({}, DEFAULT_TIMES, JSON.parse(localStorage.getItem('makanplan_times') || '{}'));
 const FOOD_TYPES  = ['Breakfast','Lunch','Cafe','Dinner','Snack'];
 const PLACE_TYPES = ['Landmark','Hotel'];
 const LANDMARK_MODES = ['🚗 Drive','🚶 Walk'];
@@ -1365,6 +1401,26 @@ function extractPlaceName(url) {
   } catch(e) { return ''; }
 }
 
+function openSettings() {
+  const types = ['Breakfast','Lunch','Cafe','Dinner','Snack','Landmark','Hotel','HotelOut'];
+  types.forEach(t => {
+    const el = document.getElementById(`st-${t}`);
+    if (el) el.value = MEAL_TIMES[t] || DEFAULT_TIMES[t];
+  });
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+
+function saveSettings() {
+  const types = ['Breakfast','Lunch','Cafe','Dinner','Snack','Landmark','Hotel','HotelOut'];
+  types.forEach(t => {
+    const el = document.getElementById(`st-${t}`);
+    if (el && el.value) MEAL_TIMES[t] = el.value;
+  });
+  localStorage.setItem('makanplan_times', JSON.stringify(MEAL_TIMES));
+  closeOverlay('settingsOverlay');
+  showToast('✅ Default times saved');
+}
+
 function openPasteModal() {
   document.getElementById('mapLinkInput').value = '';
   document.getElementById('pasteNameInput').value = '';
@@ -1494,8 +1550,8 @@ function selectMode(mode) {
   });
   const timeField = document.getElementById('editTime');
   if (timeField) {
-    if (mode === 'Check-in')  timeField.value = '15:00';
-    if (mode === 'Check-out') timeField.value = '12:00';
+    if (mode === 'Check-in')  timeField.value = MEAL_TIMES.Hotel || '15:00';
+    if (mode === 'Check-out') timeField.value = MEAL_TIMES.HotelOut || '12:00';
   }
 }
 
@@ -1527,7 +1583,7 @@ function renderModeChips(type) {
   if (type === 'Hotel') {
     const timeField = document.getElementById('editTime');
     if (timeField) {
-      timeField.value = editMode === 'Check-out' ? '12:00' : '15:00';
+      timeField.value = editMode === 'Check-out' ? (MEAL_TIMES.HotelOut || '12:00') : (MEAL_TIMES.Hotel || '15:00');
     }
   }
 }
