@@ -878,7 +878,7 @@ html, body {
 <div class="screen" id="plannerScreen">
 
   <div class="p-header">
-    <button class="back-btn" onclick="goBack()">← New Trip</button>
+    <button class="back-btn" onclick="goBack()">← Back</button>
     <div class="p-logo">Makan<span>Plan</span></div>
     <input class="p-trip-name" id="pTripName" type="text" value="" />
   </div>
@@ -965,26 +965,15 @@ html, body {
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Category</label>
-      <div class="chip-group" id="editCatChips">
-        <button class="chip active" onclick="selectCategory(this,'Food')">🍴 Food</button>
-        <button class="chip" onclick="selectCategory(this,'Places')">📍 Places</button>
-      </div>
-    </div>
-    <div class="form-group" id="editFoodTypeGroup">
-      <label class="form-label">Meal Type</label>
+    <div class="form-group">
+      <label class="form-label">Type</label>
       <div class="chip-group" id="editTypeChips">
         <button class="chip" onclick="selectChip(this,'editType','Breakfast')">☕ Breakfast</button>
         <button class="chip active" onclick="selectChip(this,'editType','Lunch')">🍜 Lunch</button>
         <button class="chip" onclick="selectChip(this,'editType','Cafe')">🧋 Cafe</button>
         <button class="chip" onclick="selectChip(this,'editType','Dinner')">🍽 Dinner</button>
         <button class="chip" onclick="selectChip(this,'editType','Snack')">🍡 Snack</button>
-      </div>
-    </div>
-    <div class="form-group" id="editPlaceTypeGroup" style="display:none">
-      <label class="form-label">Place Type</label>
-      <div class="chip-group" id="editPlaceChips">
-        <button class="chip active" onclick="selectChip(this,'editType','Landmark')">📸 Landmark</button>
+        <button class="chip" onclick="selectChip(this,'editType','Landmark')">📸 Landmark</button>
         <button class="chip" onclick="selectChip(this,'editType','Hotel')">🏨 Hotel</button>
       </div>
     </div>
@@ -1137,7 +1126,7 @@ function updateCreateBtn() {
 ═══════════════════════════════ */
 let state = { tripName: '', currentDay: 0, days: [] };
 const MEAL_EMOJIS = { Breakfast:'☕', Lunch:'🍜', Cafe:'🧋', Dinner:'🍽', Snack:'🍡', Landmark:'📸', Hotel:'🏨' };
-const MEAL_TIMES  = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'18:00', Snack:'17:00', Landmark:'10:00', Hotel:'14:00' };
+const MEAL_TIMES  = { Breakfast:'08:30', Lunch:'12:30', Cafe:'15:30', Dinner:'18:00', Snack:'17:00', Landmark:'10:00', Hotel:'15:00' };
 const FOOD_TYPES  = ['Breakfast','Lunch','Cafe','Dinner','Snack'];
 const PLACE_TYPES = ['Landmark','Hotel'];
 const LANDMARK_MODES = ['🚗 Drive','🚶 Walk'];
@@ -1436,26 +1425,13 @@ function openEdit(id) {
   chipState.editType = item.type;
   editMode = item.mode || 'Dine-in';
 
-  const isPlace = PLACE_TYPES.includes(item.type);
-
-  // Set category chips
-  document.querySelectorAll('#editCatChips .chip').forEach(c =>
-    c.classList.toggle('active', isPlace ? c.textContent.includes('Places') : c.textContent.includes('Food'))
-  );
-
-  // Show correct type group
-  document.getElementById('editFoodTypeGroup').style.display = isPlace ? 'none' : 'block';
-  document.getElementById('editPlaceTypeGroup').style.display = isPlace ? 'block' : 'none';
-
-  // Set type chips
-  const typeChipsId = isPlace ? 'editPlaceChips' : 'editTypeChips';
-  document.querySelectorAll(`#${typeChipsId} .chip`).forEach(c =>
+  // Set active type chip
+  document.querySelectorAll('#editTypeChips .chip').forEach(c =>
     c.classList.toggle('active', c.textContent.includes(item.type))
   );
 
   // Render mode chips for this type
   renderModeChips(item.type);
-  // Set active mode
   editMode = item.mode || (item.type === 'Hotel' ? 'Check-in' : item.type === 'Landmark' ? 'Drive' : 'Dine-in');
   document.querySelectorAll('#editModeChips .chip').forEach(c => {
     const key = MODE_KEYS[c.textContent.trim()] || c.textContent.trim();
@@ -1510,35 +1486,17 @@ function selectChip(el, key, value) {
   }
 }
 
-function selectCategory(el, cat) {
-  el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  const isFood = cat === 'Food';
-  document.getElementById('editFoodTypeGroup').style.display = isFood ? 'block' : 'none';
-  document.getElementById('editPlaceTypeGroup').style.display = isFood ? 'none' : 'block';
-  // Set default type for category
-  if (isFood) {
-    chipState.editType = 'Lunch';
-    document.querySelectorAll('#editTypeChips .chip').forEach(c =>
-      c.classList.toggle('active', c.textContent.includes('Lunch'))
-    );
-    renderModeChips('Food');
-  } else {
-    chipState.editType = 'Landmark';
-    document.querySelectorAll('#editPlaceChips .chip').forEach(c =>
-      c.classList.toggle('active', c.textContent.includes('Landmark'))
-    );
-    renderModeChips('Landmark');
-  }
-}
-
 function selectMode(mode) {
   editMode = mode;
   document.querySelectorAll('#editModeChips .chip').forEach(c => {
-    const txt = c.textContent.trim();
-    const key = MODE_KEYS[txt] || txt;
+    const key = MODE_KEYS[c.textContent.trim()] || c.textContent.trim();
     c.classList.toggle('active', key === mode);
   });
+  const timeField = document.getElementById('editTime');
+  if (timeField) {
+    if (mode === 'Check-in')  timeField.value = '15:00';
+    if (mode === 'Check-out') timeField.value = '12:00';
+  }
 }
 
 function renderModeChips(type) {
@@ -1564,6 +1522,14 @@ function renderModeChips(type) {
     if (isActive && !modes.map(x => MODE_KEYS[x]).includes(editMode)) editMode = key;
     return `<button class="chip ${isActive ? 'active' : ''}" onclick="selectMode('${key}')">${m}</button>`;
   }).join('');
+
+  // Set correct time when Hotel mode chips are rendered
+  if (type === 'Hotel') {
+    const timeField = document.getElementById('editTime');
+    if (timeField) {
+      timeField.value = editMode === 'Check-out' ? '12:00' : '15:00';
+    }
+  }
 }
 
 /* ═══════════════════════════════
