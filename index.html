@@ -72,7 +72,7 @@ html, body {
   z-index: 5;
   transform: translateX(100%);
   opacity: 0;
-  padding-bottom: 130px;
+  padding-bottom: 220px;
 }
 #plannerScreen.slide-in {
   transform: translateX(0);
@@ -481,6 +481,7 @@ html, body {
   font-weight: 600; background: var(--p-border); color: var(--p-muted);
 }
 .mode-badge.grab { background: rgba(76,175,125,0.15); color: var(--p-green); }
+.mode-badge.takeaway { background: rgba(245,166,35,0.15); color: var(--p-accent); }
 
 .item-name { font-size: 15px; font-weight: 600; color: var(--p-text); margin-bottom: 6px; line-height: 1.3; }
 .item-bottom { display: flex; align-items: center; justify-content: space-between; }
@@ -493,13 +494,13 @@ html, body {
 .map-btn:hover { background: rgba(245,166,35,0.2); }
 .notes-text { font-size: 11px; color: var(--p-muted); font-style: italic; }
 
+.item-bottom { display: flex; align-items: center; justify-content: space-between; }
 .del-btn {
-  position: absolute; top: 10px; right: 10px;
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 24px; height: 24px; border-radius: 50%;
   background: rgba(255,255,255,0.05); border: 1px solid var(--p-border);
-  color: var(--p-muted); font-size: 15px; cursor: pointer;
+  color: var(--p-muted); font-size: 14px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; line-height: 1;
+  transition: all 0.15s; line-height: 1; flex-shrink: 0; margin-left: auto;
 }
 .del-btn:hover, .del-btn:active { background: rgba(232,80,42,0.2); color: var(--p-accent2); border-color: var(--p-accent2); }
 
@@ -553,6 +554,19 @@ html, body {
   display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .btn-share:hover { background: #1ebe5c; }
+.btn-share { text-decoration: none; }
+
+.qbtn-share {
+  background: #25D366 !important;
+  border-color: #25D366 !important;
+  color: #fff !important;
+  flex: 2;
+  flex-direction: row !important;
+  gap: 6px;
+  text-decoration: none;
+}
+.qbtn-share span { font-size: 11px; font-weight: 700; }
+.qbtn-share:hover { background: #1ebe5c !important; border-color: #1ebe5c !important; }
 .btn-share:active, .btn-paste:active { transform: scale(0.97); }
 
 /* ── MODALS (shared) ── */
@@ -874,8 +888,10 @@ html, body {
     <div id="pItemList"></div>
   </div>
 
-  <!-- Bottom bar -->
-  <div class="p-bottom">
+</div>
+
+<!-- BOTTOM BAR — must be outside plannerScreen for position:fixed to work -->
+<div class="p-bottom" id="plannerBottomBar" style="display:none">
     <div class="quick-row-label">🍴 Food</div>
     <div class="quick-btns">
       <button class="qbtn" onclick="quickAdd('Breakfast')">☕<span>Bfast</span></button>
@@ -888,15 +904,11 @@ html, body {
     <div class="quick-btns">
       <button class="qbtn" onclick="quickAdd('Landmark')">📸<span>Spot</span></button>
       <button class="qbtn" onclick="quickAdd('Hotel')">🏨<span>Hotel</span></button>
-    </div>
-    <div class="main-actions">
-      <button class="btn-paste" onclick="openPasteModal()">🔗 Paste Link</button>
-      <button class="btn-share" onclick="shareWhatsApp()">
+      <a class="qbtn qbtn-share" id="waShareBtn" href="#" target="_blank" rel="noopener" onclick="return prepareShare(this)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Share
-      </button>
+        <span>Share itinerary via</span>
+      </a>
     </div>
-  </div>
 </div>
 
 <!-- ═══════════════════════════════
@@ -979,10 +991,11 @@ html, body {
       <div class="chip-group" id="editModeChips">
         <button class="chip active" id="modedinein" onclick="selectMode('Dine-in')">🍽 Dine-in</button>
         <button class="chip" id="modegrab" onclick="selectMode('GrabFood')">🛵 GrabFood</button>
+        <button class="chip" id="modetakeaway" onclick="selectMode('Takeaway')">🥡 Takeaway</button>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Google Maps Link</label>
+      <label class="form-label">Google Maps Link <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--p-muted)">(optional)</span></label>
       <div class="map-link-row">
         <input class="form-input" id="editMapLink" type="url" placeholder="Paste maps.google.com link" />
         <a class="map-link-preview" id="mapLinkPreview" href="#" target="_blank" style="display:none">Open 📍</a>
@@ -1127,10 +1140,10 @@ const FOOD_TYPES  = ['Breakfast','Lunch','Cafe','Dinner','Snack'];
 const PLACE_TYPES = ['Landmark','Hotel'];
 const LANDMARK_MODES = ['🚗 Drive','🚶 Walk'];
 const HOTEL_MODES    = ['🔑 Check-in','🧳 Check-out'];
-const FOOD_MODES     = ['🍽 Dine-in','🛵 GrabFood'];
+const FOOD_MODES     = ['🍽 Dine-in','🛵 GrabFood','🥡 Takeaway'];
 // Internal mode keys (stored in state)
 const MODE_KEYS = {
-  '🍽 Dine-in':'Dine-in','🛵 GrabFood':'GrabFood',
+  '🍽 Dine-in':'Dine-in','🛵 GrabFood':'GrabFood','🥡 Takeaway':'Takeaway',
   '🚗 Drive':'Drive','🚶 Walk':'Walk',
   '🔑 Check-in':'Check-in','🧳 Check-out':'Check-out'
 };
@@ -1169,17 +1182,20 @@ function doCreateTrip() {
 
   document.getElementById('createScreen').classList.add('slide-out');
   document.getElementById('plannerScreen').classList.add('slide-in');
+  document.getElementById('plannerBottomBar').style.display = 'block';
 }
 
 function goBack() {
   document.getElementById('createScreen').classList.remove('slide-out');
   document.getElementById('plannerScreen').classList.remove('slide-in');
+  document.getElementById('plannerBottomBar').style.display = 'none';
   showExistingTripBanner();
 }
 
 function resumeTrip() {
   document.getElementById('createScreen').classList.add('slide-out');
   document.getElementById('plannerScreen').classList.add('slide-in');
+  document.getElementById('plannerBottomBar').style.display = 'block';
 }
 
 function showExistingTripBanner() {
@@ -1298,15 +1314,15 @@ function renderPlannerTimeline() {
         ${!isLast ? '<div class="tl-line"></div>' : ''}
       </div>
       <div class="item-card" onclick="openEdit('${item.id}')">
-        <button class="del-btn" onclick="deleteItem(event,'${item.id}')">×</button>
         <div class="item-top">
           <div class="item-type">${MEAL_EMOJIS[item.type]} ${item.type}</div>
-          ${!['Landmark','Hotel'].includes(item.type) ? `<span class="mode-badge ${item.mode==='GrabFood'?'grab':''}">${item.mode==='GrabFood'?'🛵 GrabFood':'🍽 Dine-in'}</span>` : ''}
+          ${!['Landmark','Hotel'].includes(item.type) ? `<span class="mode-badge ${item.mode==='GrabFood'?'grab':item.mode==='Takeaway'?'takeaway':''}">${item.mode==='GrabFood'?'🛵 GrabFood':item.mode==='Takeaway'?'🥡 Takeaway':'🍽 Dine-in'}</span>` : ''}
         </div>
         <div class="item-name">${item.placeName || '<span style="color:var(--p-muted)">Add place name</span>'}</div>
         <div class="item-bottom">
           ${item.mapLink ? `<a class="map-btn" href="${item.mapLink}" target="_blank" onclick="event.stopPropagation()">📍 Maps</a>` : '<span></span>'}
-          ${item.notes ? `<span class="notes-text">${item.notes}</span>` : ''}
+          ${item.notes ? `<span class="notes-text">${item.notes}</span>` : '<span></span>'}
+          <button class="del-btn" onclick="deleteItem(event,'${item.id}')">×</button>
         </div>
       </div>
     </div>`;
@@ -1395,6 +1411,16 @@ function openEdit(id) {
   document.getElementById('editTime').value = item.time;
   document.getElementById('editName').value = item.placeName;
   document.getElementById('editNotes').value = item.notes || '';
+  const notesPlaceholders = {
+    Breakfast: 'e.g. try the nasi lemak',
+    Lunch: 'e.g. must order the char kuey teow',
+    Cafe: 'e.g. try the matcha latte',
+    Dinner: 'e.g. try the grilled fish',
+    Snack: 'e.g. only available in the evening',
+    Landmark: 'e.g. best view at sunset',
+    Hotel: 'e.g. request early check-in'
+  };
+  document.getElementById('editNotes').placeholder = notesPlaceholders[item.type] || 'e.g. add a note';
   document.getElementById('editMapLink').value = item.mapLink || '';
 
   const preview = document.getElementById('mapLinkPreview');
@@ -1547,37 +1573,38 @@ function maybeCloseOverlay(e, id) { if (e.target === document.getElementById(id)
 /* ═══════════════════════════════
    WHATSAPP
 ═══════════════════════════════ */
-function shareWhatsApp() {
+function prepareShare(anchor) {
   const tripName = state.tripName || 'My Makan Trip';
   let msg = '';
   msg += `🍜 *${tripName.toUpperCase()}*\n`;
   msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
   let hasItems = false;
-  state.days.forEach((day, di) => {
+  state.days.forEach((day) => {
     if (!day.items.length) return;
     hasItems = true;
 
     msg += `📅 *${day.date.toUpperCase()}*\n`;
     msg += `─────────────────────\n`;
 
-    [...day.items].sort((a,b) => a.time.localeCompare(b.time)).forEach((item, idx) => {
+    [...day.items].sort((a,b) => a.time.localeCompare(b.time)).forEach(item => {
       msg += `\n*${item.time}*  ${MEAL_EMOJIS[item.type]} *${item.type}*\n`;
       msg += `📍 ${item.placeName || 'TBD'}\n`;
       if (item.mapLink) msg += `🗺 ${item.mapLink}\n`;
       if (item.type === 'Landmark') msg += `${item.mode === 'Walk' ? '🚶 Walk' : '🚗 Drive'}\n`;
       else if (item.type === 'Hotel') msg += `${item.mode === 'Check-out' ? '🧳 Check-out' : '🔑 Check-in'}\n`;
-      else msg += `${item.mode === 'GrabFood' ? '🛵 _GrabFood delivery_' : '🍽 _Dine-in_'}\n`;
+      else msg += `${item.mode === 'GrabFood' ? '🛵 _GrabFood delivery_' : item.mode === 'Takeaway' ? '🥡 _Takeaway_' : '🍽 _Dine-in_'}\n`;
       if (item.notes) msg += `💬 _${item.notes}_\n`;
     });
 
     msg += `\n`;
   });
 
-  if (!hasItems) { showToast('Add some food stops first!'); return; }
+  if (!hasItems) { showToast('Add some food stops first!'); return false; }
   msg += `━━━━━━━━━━━━━━━━━━━━\n`;
   msg += `_Planned with MakanPlan 🍜_`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  anchor.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  return true;
 }
 
 /* ═══════════════════════════════
